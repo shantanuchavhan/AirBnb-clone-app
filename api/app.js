@@ -17,6 +17,7 @@ const Reservation=require('./model/ReservationSchema')
 const app = express();
 const PORT = 5000;
 
+console.log(process.env.MONGODB_URI)
 
 
 mongoose.connect(process.env.MONGODB_URI, {
