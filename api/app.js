@@ -17,9 +17,7 @@ const Reservation=require('./model/ReservationSchema')
 const app = express();
 const PORT = 5000;
 
-// const uri = 'mongodb+srv://shantanuchavhan10:3wLsliWcvunTkaWH@cluster0.rnghati.mongodb.net/';
 
-// const secretkey = 'yugfugguggj';
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -72,7 +70,7 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({ email, password });
         if (user) {
             req.session.username = user.username; // Store the username in the session
-            const token = jwt.sign({ email: user.email, id: user._id }, secretkey, { expiresIn: '1h' });
+            const token = jwt.sign({ email: user.email, id: user._id }, process.env.secretkey, { expiresIn: '1h' });
             res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
             res.json({ message: 'Logged in successfully',username:user.username });
         } else {
