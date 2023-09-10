@@ -23,9 +23,13 @@ console.log(process.env.MONGODB_URI)
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Connected to MongoDB"); // Log a message after successful connection
+})
+.catch((error) => {
+  console.error("Error connecting to MongoDB:", error); // Log an error if the connection fails
 });
-
-
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
