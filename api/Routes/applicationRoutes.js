@@ -6,7 +6,7 @@ const User = require('../model/userModel');
 const Listing = require('../model/ListingSchemamodel')
 const Reservation=require('../model/ReservationSchema')
 const jwt = require('jsonwebtoken'); // JWT token library
-
+ 
 const multer = require('multer');
 const path = require('path'); // Add path module
 const fs = require('fs');
@@ -31,6 +31,7 @@ const storage = multer.diskStorage({
 // User Registration
 
 router.post('/register', async (req, res) => {
+  console.log(req.body)
     try {
         const { username, password, email } = req.body;
         const newUser = await User.create({ username, password, email });
@@ -45,7 +46,7 @@ router.post('/register', async (req, res) => {
 // Login route
 
 router.post('/login', async (req, res) => {
-  
+    console.log(req.body)
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email, password });
