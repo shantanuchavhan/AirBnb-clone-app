@@ -8,8 +8,8 @@ const Reservation=require('../model/ReservationSchema')
 const jwt = require('jsonwebtoken'); // JWT token library
  
 const multer = require('multer');
-const path = require('path'); // Add path module
 const fs = require('fs');
+const path = require('path');
 // Generate JWT token
 function generateToken(user) {
   // Replace 'your-secret-key' with your actual secret key
@@ -101,49 +101,43 @@ router.post('/logout', (req, res) => {
   });
   
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    },
-  });
   
-  const upload = multer({ storage });
-  
-  // Define a route that uses the 'upload' middleware to handle file uploads
-  router.post('/listing', upload.array('photos'), async (req, res) => {
-    console.log(req.files, "req.files");
-    console.log(req);
-  
-    const uploadedFiles = [];
-    const newlistings = []; // Store created listings
-  
-    try {
-      for (let i = 0; i < req.files.length; i++) {
-        const { path, originalname, mimetype } = req.files[i];
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        const newPath = path + '.' + ext;
-        fs.renameSync(path, newPath);
-        uploadedFiles.push(newPath.replace('uploads/', ''));
-  
-  
-      }
-      let listingData = JSON.parse(req.body.listing);
-      console.log(listingData, "listigdata");
-      listingData = { ...listingData, photos: uploadedFiles };
-      console.log('New listings created:', newlistings);
-    } catch (error) {
-      console.error('Error creating listings:', error);
-      return res.status(500).json({ error: 'An error occurred while creating the listings' });
-    }
-  
-    // Send a response after the loop has completed
-    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-  });
+
+// Create the 'uploads/' directory if it doesn't exist
+const uploadDirectory = 'uploads/';
+if (!fs.existsSync(uploadDirectory)) {
+  fs.mkdirSync(uploadDirectory);
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDirectory);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
+// Define a route that uses the 'upload' middleware to handle file uploads
+router.post('/listing', async (req, res) => {
+  console.log(req.body,"yyyhu")
+  try {
+    const uploadedFiles = req.files.map((file) => file.path); // Get paths of uploaded files
+    const listingData = JSON.parse(req.body.listing); // Parse JSON data
+    const updatedListing = { ...listingData, photos: uploadedFiles }; // Combine data and file paths
+
+    // Process the updatedListing as needed (e.g., save to a database)
+
+    res.status(201).json({ message: 'Listing created successfully', listing: updatedListing });
+  } catch (error) {
+    console.error('Error creating listing:', error);
+    res.status(500).json({ error: 'An error occurred while creating the listing' });
+  }
+});
+
 
   router.post('/Listing/delete',async(req,res)=>{
     console.log(req.body, "req.body");
