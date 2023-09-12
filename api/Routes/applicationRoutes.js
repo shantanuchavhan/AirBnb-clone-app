@@ -116,7 +116,7 @@ router.post('/logout', (req, res) => {
   // Define a route that uses the 'upload' middleware to handle file uploads
   router.post('/listing', upload.array('photos'), async (req, res) => {
     console.log(req.files, "req.files");
-    console.log(req.body, "req.body");
+    console.log(req);
   
     const uploadedFiles = [];
     const newlistings = []; // Store created listings
@@ -130,17 +130,11 @@ router.post('/logout', (req, res) => {
         fs.renameSync(path, newPath);
         uploadedFiles.push(newPath.replace('uploads/', ''));
   
-        // Create a new listing using the Listing model (if applicable)
-        // ...
   
       }
       let listingData = JSON.parse(req.body.listing);
       console.log(listingData, "listigdata");
       listingData = { ...listingData, photos: uploadedFiles };
-      // Create a new listing using the Listing model (if applicable)
-      // const newListing = await Listing.create(listingData);
-      // newlistings.push(newListing);
-  
       console.log('New listings created:', newlistings);
     } catch (error) {
       console.error('Error creating listings:', error);
