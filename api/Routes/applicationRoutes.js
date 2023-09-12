@@ -21,7 +21,7 @@ function generateToken(user) {
 // User Registration
 
 router.post('/register', async (req, res) => {
-  console.log(req.body)
+  console.log(req.body,"req.body")
     try {
         const { username, password, email } = req.body;
         const newUser = await User.create({ username, password, email });
@@ -36,7 +36,7 @@ router.post('/register', async (req, res) => {
 // Login route
 
 router.post('/login', async (req, res) => {
-    console.log(req.body)
+  console.log(req.body,"req.body")
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email, password });
@@ -58,6 +58,7 @@ router.post('/login', async (req, res) => {
 // Profile route
 
 router.get('/profile', (req, res) => {
+
     const username = req.session.username;
     if (username) {
         res.json({ username: username });
@@ -87,7 +88,7 @@ router.post('/logout', (req, res) => {
 
   
 router.post('/allListing',async(req,res)=>{
-    
+    console.log(req.body,"req.body")
     ownerName=req.body.userName
     
     try {
@@ -167,7 +168,8 @@ router.post('/allListing',async(req,res)=>{
 
 
   router.put('/listings/:id', upload.array('photos'), async (req, res) => {
-    console.log(req.body,"ahciuahc",req.files)
+    console.log(req.body,"req.body")
+    console.log(req.files)
     const listingId=req.params.id 
     const listingData = JSON.parse(req.body.listing);
     const { title, description, amenities, price, location } = listingData;
