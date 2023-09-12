@@ -7,33 +7,31 @@ const Listing = require('../model/ListingSchemamodel')
 const Reservation=require('../model/ReservationSchema')
 const jwt = require('jsonwebtoken'); // JWT token library
  
+const multer = require('multer');
 const path = require('path'); // Add path module
 const fs = require('fs');
 // Generate JWT token
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Define the destination folder for uploaded files
+function generateToken(user) {
+  // Replace 'your-secret-key' with your actual secret key
+  return jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+}
 
-
-
-
-
-const bodyParser = require('body-parser');
-const app = express();
-
-// Parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// Parse application/json
-app.use(bodyParser.json());
-
-
-
-
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    },
+  });
+  
+  const upload = multer({ storage });
 
 // User Registration
 
 router.post('/register', async (req, res) => {
-  console.log(req.body,"req.body")
+  console.log(req.body)
     try {
         const { username, password, email } = req.body;
         const newUser = await User.create({ username, password, email });
@@ -48,7 +46,7 @@ router.post('/register', async (req, res) => {
 // Login route
 
 router.post('/login', async (req, res) => {
-  console.log(req.body,"req.body")
+    console.log(req.body)
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email, password });
@@ -70,7 +68,6 @@ router.post('/login', async (req, res) => {
 // Profile route
 
 router.get('/profile', (req, res) => {
-
     const username = req.session.username;
     if (username) {
         res.json({ username: username });
@@ -96,69 +93,64 @@ router.post('/logout', (req, res) => {
     });
   });
 
-  
+
 
   
-  router.post('/allListing', async (req, res) => {
-    console.log(req.body, "req.body");
-    const userName = req.body.userName.userName; // Corrected assignment
+router.post('/allListing',async(req,res)=>{
+    
+    ownerName=req.body.userName
+    
+    try {
+      const listings = await Listing.find({ownerName:ownerName.userName})
+      res.json(listings);
+      
+    } catch (error) {
+      console.error('Error listings not available:', error);
+      res.status(500).json({ error: 'An error occurred while geting listings' });
+    }
+
+  })
+
+  
+router.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+    console.log(req.files,"req.files")
+    console.log(req.body,"req.body")
+    
+    
+
+    const uploadedFiles = [];
+    const newlistings = []; // Store created listings
   
     try {
-      const listings = await Listing.find({ ownerName: userName });
-      res.json(listings);
+      for (let i = 0; i < req.files.length; i++) {
+        const { path, originalname, mimetype } = req.files[i];
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1];
+        const newPath = path + '.' + ext;
+        fs.renameSync(path, newPath);
+        uploadedFiles.push(newPath.replace('uploads/', ''));
+  
+        // Create a new listing using the Listing model
+     
+      }
+      let listingData = JSON.parse(req.body.listing);
+      console.log(listingData,"listigdata")
+      listingData={...listingData,photos:uploadedFiles}
+      const newListing = await Listing.create(listingData);
+      newlistings.push(newListing); // Add the created listing to the array
+  
+      console.log('New listings created:', newlistings);
     } catch (error) {
-      console.error('Error fetching listings:', error);
-      res.status(500).json({ error: 'An error occurred while getting listings' });
+      console.error('Error creating listings:', error);
+      return res.status(500).json({ error: 'An error occurred while creating the listings' });
     }
+  
+    // Send a response after the loop has completed
+    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   });
   
 
-  
-
-// Create the 'uploads/' directory if it doesn't exist
-const uploadDirectory = 'uploads/';
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory);
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDirectory);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
-
-
-
-
-// Define a route that uses the 'upload' middleware to handle file uploads
-// Define a route that uses the 'upload' middleware to handle file uploads
-router.post('/listing', upload.array('photos'), async (req, res) => {
-  console.log(req.body,"iujk")
-  try {
-    const uploadedFiles = req.files.map((file) => file.path); // Get paths of uploaded files
-    const listingData = JSON.parse(req.body.listing); // Parse JSON data
-
-    // Handle uploaded files and listingData separately
-    // Process the uploadedFiles (e.g., save to a folder) and listingData (e.g., save to a database)
-
-    const updatedListing = { ...listingData, photos: uploadedFiles }; // Combine data and file paths
-
-    res.status(201).json({ message: 'Listing created successfully', listing: updatedListing });
-  } catch (error) {
-    console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'An error occurred while creating the listing' });
-  }
-});
-
-
-
   router.post('/Listing/delete',async(req,res)=>{
-    console.log(req.body, "req.body");
     try {
       let listing_title=req.body.title
       console.log(listing_title,"title" )
@@ -172,9 +164,8 @@ router.post('/listing', upload.array('photos'), async (req, res) => {
   })
 
 
-  router.put('/listings/:id', upload.array('photos'), async (req, res) => {
-    console.log(req.body,"req.body")
-    console.log(req.files)
+  router.put('/listings/:id', photosMiddleWare.array('photos'), async (req, res) => {
+    console.log(req.body,"ahciuahc",req.files)
     const listingId=req.params.id 
     const listingData = JSON.parse(req.body.listing);
     const { title, description, amenities, price, location } = listingData;
@@ -212,7 +203,6 @@ router.post('/listing', upload.array('photos'), async (req, res) => {
 
 
 router.post('/filter', async (req, res) => {
-  console.log(req.body, "req.body");
     try {
       const filterName = req.body.filterName; // Assuming you are sending a filterName in the request body
       console.log(filterName)
@@ -265,7 +255,6 @@ router.post('/filter', async (req, res) => {
 
 
 router.post("/Reserve", async (req, res) => {
-  console.log(req.body, "req.body");
     try {
       const Reservation_data = req.body;
       
@@ -296,7 +285,6 @@ router.post("/Reserve", async (req, res) => {
 
 
 router.post("/search", async (req, res) => {
-  console.log(req.body, "req.body");
     try {
         const searchQuery = req.body.location; // Get the location from the request body
         
@@ -314,7 +302,6 @@ router.post("/search", async (req, res) => {
 
 
 router.post("/Trips", async (req, res) => {
-  console.log(req.body, "req.body");
   try {
       const user = req.body;
       const allTrips = await Reservation.find(user);
@@ -348,7 +335,6 @@ router.post("/Trips", async (req, res) => {
 
 
 router.post('/Trip/delete',async(req,res)=>{
-  console.log(req.body, "req.body");
   try {
     let tripPlaceId=req.body
     console.log(tripPlaceId,"title" )
@@ -364,7 +350,6 @@ router.post('/Trip/delete',async(req,res)=>{
 
 
 router.post("/Bookings", async (req, res) => {
-  console.log(req.body, "req.body");
   try {
     const owner = req.body; // Assuming you're extracting owner information from the request body
 
@@ -402,7 +387,6 @@ router.post("/Bookings", async (req, res) => {
 
 
 router.post('/Booking/delete',async(req,res)=>{
-  console.log(req.body, "req.body");
   try {
     let BookingId=req.body
     console.log(BookingId,"title" )
@@ -419,7 +403,6 @@ router.post('/Booking/delete',async(req,res)=>{
 
 
 router.get('/listings/:id/reviews', async (req, res) => {
-  console.log(req.body, "req.body");
   try {
       const listingId = req.params.id;
       console.log("listingid:",listingId)
@@ -447,7 +430,6 @@ router.get('/listings/:id/reviews', async (req, res) => {
 
 // Backend code
 router.post('/listings/:id/reviews', async (req, res) => {
-  console.log(req.body, "req.body");
   const listingId = req.params.id;
   const reviewData = req.body;
   console.log(reviewData, "reviewData");
@@ -480,7 +462,6 @@ router.post('/listings/:id/reviews', async (req, res) => {
 
 
 router.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
-  console.log(req.body, "req.body");
   const listingId = req.params.id;
   const reviewId = req.params.reviewId;
   
