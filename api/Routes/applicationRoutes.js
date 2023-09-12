@@ -7,14 +7,26 @@ const Listing = require('../model/ListingSchemamodel')
 const Reservation=require('../model/ReservationSchema')
 const jwt = require('jsonwebtoken'); // JWT token library
  
-const multer = require('multer');
+const path = require('path'); // Add path module
 const fs = require('fs');
-const path = require('path');
 // Generate JWT token
-function generateToken(user) {
-  // Replace 'your-secret-key' with your actual secret key
-  return jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
-}
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Define the destination folder for uploaded files
+
+
+
+
+
+const bodyParser = require('body-parser');
+const app = express();
+
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Parse application/json
+app.use(bodyParser.json());
+
+
 
 
 
@@ -119,17 +131,21 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+
+
+
 
 // Define a route that uses the 'upload' middleware to handle file uploads
-router.post('/listing', async (req, res) => {
-  console.log(req.body,"yyyhu")
+// Define a route that uses the 'upload' middleware to handle file uploads
+router.post('/listing', upload.array('photos'), async (req, res) => {
   try {
     const uploadedFiles = req.files.map((file) => file.path); // Get paths of uploaded files
     const listingData = JSON.parse(req.body.listing); // Parse JSON data
-    const updatedListing = { ...listingData, photos: uploadedFiles }; // Combine data and file paths
 
-    // Process the updatedListing as needed (e.g., save to a database)
+    // Handle uploaded files and listingData separately
+    // Process the uploadedFiles (e.g., save to a folder) and listingData (e.g., save to a database)
+
+    const updatedListing = { ...listingData, photos: uploadedFiles }; // Combine data and file paths
 
     res.status(201).json({ message: 'Listing created successfully', listing: updatedListing });
   } catch (error) {
@@ -137,6 +153,7 @@ router.post('/listing', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while creating the listing' });
   }
 });
+
 
 
   router.post('/Listing/delete',async(req,res)=>{
