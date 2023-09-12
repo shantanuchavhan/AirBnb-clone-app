@@ -114,7 +114,7 @@ router.post('/allListing',async(req,res)=>{
   const upload = multer({ storage });
   
   // Define a route that uses the 'upload' middleware to handle file uploads
-  app.post('/listing', upload.array('photos'), async (req, res) => {
+  router.post('/listing', upload.array('photos'), async (req, res) => {
     console.log(req.files, "req.files");
     console.log(req.body, "req.body");
   
@@ -165,7 +165,7 @@ router.post('/allListing',async(req,res)=>{
   })
 
 
-  router.put('/listings/:id', photosMiddleWare.array('photos'), async (req, res) => {
+  router.put('/listings/:id', upload.array('photos'), async (req, res) => {
     console.log(req.body,"ahciuahc",req.files)
     const listingId=req.params.id 
     const listingData = JSON.parse(req.body.listing);
