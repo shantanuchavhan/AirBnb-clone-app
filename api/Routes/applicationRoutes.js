@@ -89,7 +89,7 @@ router.post('/logout', (req, res) => {
   
   router.post('/allListing', async (req, res) => {
     console.log(req.body, "req.body");
-    const userName = req.body.userName; // Corrected assignment
+    const userName = req.body.userName.userName; // Corrected assignment
   
     try {
       const listings = await Listing.find({ ownerName: userName });
