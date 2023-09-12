@@ -87,20 +87,19 @@ router.post('/logout', (req, res) => {
   
 
   
-router.post('/allListing',async(req,res)=>{
-    console.log(req.body,"req.body")
-    ownerName=req.body.userName
-    
+  router.post('/allListing', async (req, res) => {
+    console.log(req.body, "req.body");
+    const userName = req.body.userName; // Corrected assignment
+  
     try {
-      const listings = await Listing.find({ownerName:ownerName.userName})
+      const listings = await Listing.find({ ownerName: userName });
       res.json(listings);
-      
     } catch (error) {
-      console.error('Error listings not available:', error);
-      res.status(500).json({ error: 'An error occurred while geting listings' });
+      console.error('Error fetching listings:', error);
+      res.status(500).json({ error: 'An error occurred while getting listings' });
     }
-
-  })
+  });
+  
 
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
