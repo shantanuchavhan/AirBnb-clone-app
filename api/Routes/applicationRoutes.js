@@ -152,6 +152,7 @@ router.post('/allListing',async(req,res)=>{
   });
 
   router.post('/Listing/delete',async(req,res)=>{
+    console.log(req.body, "req.body");
     try {
       let listing_title=req.body.title
       console.log(listing_title,"title" )
@@ -204,6 +205,7 @@ router.post('/allListing',async(req,res)=>{
 
 
 router.post('/filter', async (req, res) => {
+  console.log(req.body, "req.body");
     try {
       const filterName = req.body.filterName; // Assuming you are sending a filterName in the request body
       console.log(filterName)
@@ -256,6 +258,7 @@ router.post('/filter', async (req, res) => {
 
 
 router.post("/Reserve", async (req, res) => {
+  console.log(req.body, "req.body");
     try {
       const Reservation_data = req.body;
       
@@ -286,6 +289,7 @@ router.post("/Reserve", async (req, res) => {
 
 
 router.post("/search", async (req, res) => {
+  console.log(req.body, "req.body");
     try {
         const searchQuery = req.body.location; // Get the location from the request body
         
@@ -303,6 +307,7 @@ router.post("/search", async (req, res) => {
 
 
 router.post("/Trips", async (req, res) => {
+  console.log(req.body, "req.body");
   try {
       const user = req.body;
       const allTrips = await Reservation.find(user);
@@ -336,6 +341,7 @@ router.post("/Trips", async (req, res) => {
 
 
 router.post('/Trip/delete',async(req,res)=>{
+  console.log(req.body, "req.body");
   try {
     let tripPlaceId=req.body
     console.log(tripPlaceId,"title" )
@@ -351,6 +357,7 @@ router.post('/Trip/delete',async(req,res)=>{
 
 
 router.post("/Bookings", async (req, res) => {
+  console.log(req.body, "req.body");
   try {
     const owner = req.body; // Assuming you're extracting owner information from the request body
 
@@ -388,6 +395,7 @@ router.post("/Bookings", async (req, res) => {
 
 
 router.post('/Booking/delete',async(req,res)=>{
+  console.log(req.body, "req.body");
   try {
     let BookingId=req.body
     console.log(BookingId,"title" )
@@ -404,6 +412,7 @@ router.post('/Booking/delete',async(req,res)=>{
 
 
 router.get('/listings/:id/reviews', async (req, res) => {
+  console.log(req.body, "req.body");
   try {
       const listingId = req.params.id;
       console.log("listingid:",listingId)
@@ -431,6 +440,7 @@ router.get('/listings/:id/reviews', async (req, res) => {
 
 // Backend code
 router.post('/listings/:id/reviews', async (req, res) => {
+  console.log(req.body, "req.body");
   const listingId = req.params.id;
   const reviewData = req.body;
   console.log(reviewData, "reviewData");
@@ -463,6 +473,7 @@ router.post('/listings/:id/reviews', async (req, res) => {
 
 
 router.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
+  console.log(req.body, "req.body");
   const listingId = req.params.id;
   const reviewId = req.params.reviewId;
   
