@@ -138,6 +138,7 @@ const storage = multer.diskStorage({
 // Define a route that uses the 'upload' middleware to handle file uploads
 // Define a route that uses the 'upload' middleware to handle file uploads
 router.post('/listing', upload.array('photos'), async (req, res) => {
+  console.log(req.body,"iujk")
   try {
     const uploadedFiles = req.files.map((file) => file.path); // Get paths of uploaded files
     const listingData = JSON.parse(req.body.listing); // Parse JSON data
