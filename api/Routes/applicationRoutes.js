@@ -16,17 +16,7 @@ function generateToken(user) {
   return jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
 }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    },
-  });
-  
-  const upload = multer({ storage });
+
 
 // User Registration
 
@@ -93,7 +83,7 @@ router.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ dest: 'uploads' });
+  
 
   
 router.post('/allListing',async(req,res)=>{
@@ -111,13 +101,23 @@ router.post('/allListing',async(req,res)=>{
 
   })
 
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    },
+  });
   
-router.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
-    console.log(req.files,"req.files")
-    console.log(req.body,"req.body")
-    
-    
-
+  const upload = multer({ storage });
+  
+  // Define a route that uses the 'upload' middleware to handle file uploads
+  app.post('/listing', upload.array('photos'), async (req, res) => {
+    console.log(req.files, "req.files");
+    console.log(req.body, "req.body");
+  
     const uploadedFiles = [];
     const newlistings = []; // Store created listings
   
@@ -130,14 +130,16 @@ router.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
         fs.renameSync(path, newPath);
         uploadedFiles.push(newPath.replace('uploads/', ''));
   
-        // Create a new listing using the Listing model
-     
+        // Create a new listing using the Listing model (if applicable)
+        // ...
+  
       }
       let listingData = JSON.parse(req.body.listing);
-      console.log(listingData,"listigdata")
-      listingData={...listingData,photos:uploadedFiles}
-      const newListing = await Listing.create(listingData);
-      newlistings.push(newListing); // Add the created listing to the array
+      console.log(listingData, "listigdata");
+      listingData = { ...listingData, photos: uploadedFiles };
+      // Create a new listing using the Listing model (if applicable)
+      // const newListing = await Listing.create(listingData);
+      // newlistings.push(newListing);
   
       console.log('New listings created:', newlistings);
     } catch (error) {
@@ -148,7 +150,6 @@ router.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
     // Send a response after the loop has completed
     res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   });
-  
 
   router.post('/Listing/delete',async(req,res)=>{
     try {
