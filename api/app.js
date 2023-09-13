@@ -10,9 +10,9 @@ const path = require('path'); // Add path module
 const fs = require('fs');
 
 const jwt = require('jsonwebtoken');
-const User = require('../model/userModel');
-const Listing = require('../model/ListingSchemamodel')
-const Reservation=require('../model/ReservationSchema')
+const User = require('./model/userModel');
+const Listing = require('./model/ListingSchemamodel')
+const Reservation=require('./model/ReservationSchema')
 
 const app = express();
 const PORT = 5000;
