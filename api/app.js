@@ -46,6 +46,18 @@ if (!fs.existsSync(uploadsFolder)) {
 }
 
 
+const storage = multer.memoryStorage();
+const photosMiddleWare = multer({ storage: storage });
+
+// Configure Cloudinary with your account credentials
+import {v2 as cloudinary} from 'cloudinary';
+          
+cloudinary.config({ 
+  cloud_name: 'ddw1upvx3', 
+  api_key: '935838691454949', 
+  api_secret: '2ZR0CSz_KyiZUN96SEmtB9Zwp7U' 
+});
+
 
 // Register route
 app.post('/register', async (req, res) => {
@@ -106,7 +118,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ dest: 'uploads' });
+ 
 
   app.post('/allListing',async(req,res)=>{
     
@@ -123,43 +135,73 @@ app.post('/logout', (req, res) => {
 
   })
 
-  app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
-    console.log(req.files,"req.files")
-    console.log(req.body,"req.body")
-    
-    
+  // app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+  //   console.log(req.files,"req.files")
+  //   console.log(req.body,"req.body")
+  //   const uploadedFiles = [];
+  //   const newlistings = []; // Store created listings
+  
+  //   try {
+  //     for (let i = 0; i < req.files.length; i++) {
+  //       const { path, originalname, mimetype } = req.files[i];
+  //       const parts = originalname.split('.');
+  //       const ext = parts[parts.length - 1];
+  //       const newPath = path + '.' + ext;
+  //       console.log(newPath,"iuoih")
+  //       fs.renameSync(path, newPath);
+  //       uploadedFiles.push(newPath.replace('uploads/', ''));     
+  //     }
+  //     let listingData = JSON.parse(req.body.listing);
+  //     console.log(listingData,"listigdata")
+  //     listingData={...listingData,photos:uploadedFiles}
+  //     const newListing = await Listing.create(listingData);
+  //     newlistings.push(newListing); // Add the created listing to the array
+  
+  //     console.log('New listings created:', newlistings);
+  //   } catch (error) {
+  //     console.error('Error creating listings:', error);
+  //     return res.status(500).json({ error: 'An error occurred while creating the listings' });
+  //   }  
+  //   // Send a response after the loop has completed
+  //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
+  // });
 
-    const uploadedFiles = [];
-    const newlistings = []; // Store created listings
+
+
   
-    try {
-      for (let i = 0; i < req.files.length; i++) {
-        const { path, originalname, mimetype } = req.files[i];
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        const newPath = path + '.' + ext;
-        console.log(newPath,"iuoih")
-        fs.renameSync(path, newPath);
-        uploadedFiles.push(newPath.replace('uploads/', ''));
-  
-        // Create a new listing using the Listing model
-     
-      }
-      let listingData = JSON.parse(req.body.listing);
-      console.log(listingData,"listigdata")
-      listingData={...listingData,photos:uploadedFiles}
-      const newListing = await Listing.create(listingData);
-      newlistings.push(newListing); // Add the created listing to the array
-  
-      console.log('New listings created:', newlistings);
-    } catch (error) {
-      console.error('Error creating listings:', error);
-      return res.status(500).json({ error: 'An error occurred while creating the listings' });
+app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+  const uploadedFiles = [];
+  const newlistings = []; // Store created listings
+
+  try {
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      const result = await cloudinary.uploader.upload(file.buffer.toString('base64'));
+
+      // Store the Cloudinary image URL in your uploadedFiles array
+      uploadedFiles.push(result.secure_url);
     }
-  
+
+    // Combine uploaded image URLs with the other listing data
+    let listingData = JSON.parse(req.body.listing);
+    console.log(listingData,"listigdata")
+    listingData={...listingData,photos:uploadedFiles}
+    const newListing = await Listing.create(listingData);
+    newlistings.push(newListing); // Add the created listing to the array
+
+    // Create a new listing using the Listing model
+   
+    console.log('New listings created:', newlistings);
+
     // Send a response after the loop has completed
     res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-  });
+  } catch (error) {
+    console.error('Error creating listings:', error);
+    return res.status(500).json({ error: 'An error occurred while creating the listings' });
+  }
+});
+
+  
   
   app.post('/Listing/delete',async(req,res)=>{
     try {
