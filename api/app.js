@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
-app.use('./uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
 app.use(cookieParser());
@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadsFolder)) {
 
 
 const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ storage: storage });
+const photosMiddleWare = multer({ dest: 'uploads' });
 
 
           
