@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadsFolder)) {
 
 
 const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ storage: storage });
+const photosMiddleWare = multer({ storage:storage});
 
 
           
@@ -170,13 +170,10 @@ app.post('/logout', (req, res) => {
 
 
   
-// Function to generate a unique identifier
 function generateUniqueIdentifier() {
-  const timestamp = new Date().getTime(); // Get the current timestamp
-  const randomValue = Math.floor(Math.random() * 1000); // Generate a random number
-  return `image_${timestamp}_${randomValue}`;
+  // Generate a UUID (Universally Unique Identifier)
+  return uuidv4();
 }
-
 
   
 app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
