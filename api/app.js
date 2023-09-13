@@ -10,7 +10,7 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path'); // Add path module
 const fs = require('fs');
-
+const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 const User = require('./model/userModel');
 const Listing = require('./model/ListingSchemamodel')
@@ -38,6 +38,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
+
+
+
 
 
 const uploadsFolder = path.join(__dirname, 'uploads'); // Use path.join to ensure shorter paths
@@ -166,6 +169,11 @@ app.post('/logout', (req, res) => {
   // });
 
 
+  
+function generateUniqueIdentifier() {
+  // Generate a UUID (Universally Unique Identifier)
+  return uuidv4();
+}
 
   
 app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
@@ -175,7 +183,8 @@ app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
   try {
     for (let i = 0; i < req.files.length; i++) {
       const file = req.files[i];
-      const result = await cloudinary.uploader.upload(file.buffer.toString('base64'));
+      const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
+      const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
 
       // Store the Cloudinary image URL in your uploadedFiles array
       uploadedFiles.push(result.secure_url);
