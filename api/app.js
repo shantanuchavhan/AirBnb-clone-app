@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 require('dotenv').config();
 
@@ -17,24 +19,19 @@ const Reservation=require('./model/ReservationSchema')
 const app = express();
 const PORT = 5000;
 
-console.log(process.env.MONGODB_URI)
 
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(() => {
-  console.log("Connected to MongoDB"); // Log a message after successful connection
-})
-.catch((error) => {
-  console.error("Error connecting to MongoDB:", error); // Log an error if the connection fails
 });
+
+
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
-//imports
+
 app.use(cookieParser());
 app.use(session({
   secret: 'mkmvorenbtop',
@@ -52,7 +49,7 @@ const storage = multer.diskStorage({
   },
 });
 
-
+const upload = multer({ storage });
 
 
 // Register route
@@ -70,7 +67,6 @@ app.post('/register', async (req, res) => {
 
 // Login route
 app.post('/login', async (req, res) => {
-  
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email, password });
@@ -117,10 +113,10 @@ app.post('/logout', (req, res) => {
 
   const photosMiddleWare = multer({ dest: 'uploads' });
 
-  app.post('/allListing',photosMiddleWare,async(req,res)=>{
+  app.post('/allListing',async(req,res)=>{
     
     ownerName=req.body.userName
-    
+    console.log(ownerName.userName,"req.ody")
     try {
       const listings = await Listing.find({ownerName:ownerName.userName})
       res.json(listings);
@@ -526,3 +522,5 @@ app.listen(PORT, () => {
 });
 
 
+
+ 
