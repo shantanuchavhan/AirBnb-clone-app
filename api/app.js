@@ -40,7 +40,7 @@ app.use(session({
 }));
 
 
-const uploadsFolder = './uploads';
+const uploadsFolder = path.join(__dirname, 'uploads'); // Use path.join to ensure shorter paths
 if (!fs.existsSync(uploadsFolder)) {
   fs.mkdirSync(uploadsFolder);
 }
