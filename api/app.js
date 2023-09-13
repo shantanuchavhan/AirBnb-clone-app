@@ -183,9 +183,11 @@ app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
   try {
     for (let i = 0; i < req.files.length; i++) {
       const file = req.files[i];
+      console.log(file)
       const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
+      console.log(uniqueIdentifier)
       const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
-
+      
       // Store the Cloudinary image URL in your uploadedFiles array
       uploadedFiles.push(result.secure_url);
     }
