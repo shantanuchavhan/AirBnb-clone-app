@@ -176,33 +176,34 @@ function generateUniqueIdentifier() {
 }
 
   
-app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+app.post('/listing', async (req, res) => {
   const uploadedFiles = [];
   const newlistings = []; // Store created listings
 
   try {
-    for (let i = 0; i < req.files.length; i++) {
-      const file = req.files[i];
-      const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
-      const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
+    console.log(req.body,"dgrf")
+  //   for (let i = 0; i < req.files.length; i++) {
+  //     const file = req.files[i];
+  //     const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
+  //     const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
       
-      // Store the Cloudinary image URL in your uploadedFiles array
-      uploadedFiles.push(result.secure_url);
-    }
+  //     // Store the Cloudinary image URL in your uploadedFiles array
+  //     uploadedFiles.push(result.secure_url);
+  //   }
 
-    // Combine uploaded image URLs with the other listing data
-    let listingData = JSON.parse(req.body.listing);
-    console.log(listingData,"listigdata")
-    listingData={...listingData,photos:uploadedFiles}
-    const newListing = await Listing.create(listingData);
-    newlistings.push(newListing); // Add the created listing to the array
+  //   // Combine uploaded image URLs with the other listing data
+  //   let listingData = JSON.parse(req.body.listing);
+  //   console.log(listingData,"listigdata")
+  //   listingData={...listingData,photos:uploadedFiles}
+  //   const newListing = await Listing.create(listingData);
+  //   newlistings.push(newListing); // Add the created listing to the array
 
-    // Create a new listing using the Listing model
+  //   // Create a new listing using the Listing model
    
-    console.log('New listings created:', newlistings);
+  //   console.log('New listings created:', newlistings);
 
-    // Send a response after the loop has completed
-    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
+  //   // Send a response after the loop has completed
+  //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   } catch (error) {
     console.error('Error creating listings:', error);
     return res.status(500).json({ error: 'An error occurred while creating the listings' });
