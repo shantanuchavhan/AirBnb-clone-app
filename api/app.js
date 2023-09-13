@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadsFolder)) {
 
 
 const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ storage:storage});
+const photosMiddleWare = multer({ storage: storage });
 
 
           
@@ -183,7 +183,6 @@ app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
   try {
     for (let i = 0; i < req.files.length; i++) {
       const file = req.files[i];
-      console.log(file)
       const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
       const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
       
