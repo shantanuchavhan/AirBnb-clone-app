@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadsFolder)) {
 
 
 const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ storage: "uploads"});
+const photosMiddleWare = multer({ storage: storage });
 
 
           
