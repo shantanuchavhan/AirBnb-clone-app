@@ -34,7 +34,7 @@ app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
-//cerferf
+
 app.use(cookieParser());
 app.use(session({
   secret: 'mkmvorenbtop',
