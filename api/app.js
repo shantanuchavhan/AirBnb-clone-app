@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
+app.use('./uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
 app.use(cookieParser());
@@ -39,16 +39,11 @@ app.use(session({
   saveUninitialized: true
 }));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  },
-});
 
+const uploadsFolder = './uploads';
+if (!fs.existsSync(uploadsFolder)) {
+  fs.mkdirSync(uploadsFolder);
+}
 
 
 
@@ -111,7 +106,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ dest: './uploads' });
+  const photosMiddleWare = multer({ dest: 'uploads' });
 
   app.post('/allListing',async(req,res)=>{
     
