@@ -10,7 +10,7 @@ const session = require('express-session');
 const multer = require('multer');
 const path = require('path'); // Add path module
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+
 const jwt = require('jsonwebtoken');
 const User = require('./model/userModel');
 const Listing = require('./model/ListingSchemamodel')
@@ -19,7 +19,7 @@ const Reservation=require('./model/ReservationSchema')
 const app = express();
 const PORT = 5000;
 
-const cloudinary = require('cloudinary').v2;
+
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -29,7 +29,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
-
 app.use('/uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
@@ -40,26 +39,17 @@ app.use(session({
   saveUninitialized: true
 }));
 
-
-
-
-
-const uploadsFolder = path.join(__dirname, 'uploads'); // Use path.join to ensure shorter paths
-if (!fs.existsSync(uploadsFolder)) {
-  fs.mkdirSync(uploadsFolder);
-}
-
-
-const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ storage: storage });
-
-
-          
-cloudinary.config({ 
-  cloud_name: 'ddw1upvx3', 
-  api_key: '935838691454949', 
-  api_secret: '2ZR0CSz_KyiZUN96SEmtB9Zwp7U' 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 100);
+    cb(null,uniqueSuffix + path.extname(file.originalname));
+  },
 });
+
+
 
 
 // Register route
@@ -121,7 +111,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
- 
+  const photosMiddleWare = multer({ storage :storage  });
 
   app.post('/allListing',async(req,res)=>{
     
@@ -138,80 +128,43 @@ app.post('/logout', (req, res) => {
 
   })
 
-  // app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
-  //   console.log(req.files,"req.files")
-  //   console.log(req.body,"req.body")
-  //   const uploadedFiles = [];
-  //   const newlistings = []; // Store created listings
-  
-  //   try {
-  //     for (let i = 0; i < req.files.length; i++) {
-  //       const { path, originalname, mimetype } = req.files[i];
-  //       const parts = originalname.split('.');
-  //       const ext = parts[parts.length - 1];
-  //       const newPath = path + '.' + ext;
-  //       console.log(newPath,"iuoih")
-  //       fs.renameSync(path, newPath);
-  //       uploadedFiles.push(newPath.replace('uploads/', ''));     
-  //     }
-  //     let listingData = JSON.parse(req.body.listing);
-  //     console.log(listingData,"listigdata")
-  //     listingData={...listingData,photos:uploadedFiles}
-  //     const newListing = await Listing.create(listingData);
-  //     newlistings.push(newListing); // Add the created listing to the array
-  
-  //     console.log('New listings created:', newlistings);
-  //   } catch (error) {
-  //     console.error('Error creating listings:', error);
-  //     return res.status(500).json({ error: 'An error occurred while creating the listings' });
-  //   }  
-  //   // Send a response after the loop has completed
-  //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-  // });
-
-
-  
-function generateUniqueIdentifier() {
-  // Generate a UUID (Universally Unique Identifier)
-  return uuidv4();
-}
-
-  
-app.post('/listing', async (req, res) => {
-  console.log(req.body,"dgrf")
+  app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+    console.log(req.files,"req.files")
+    console.log(req.body,"req.body")
+    
     
 
-  // try {
-    
-  //   for (let i = 0; i < req.files.length; i++) {
-  //     const file = req.files[i];
-  //     const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
-  //     const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
-      
-  //     // Store the Cloudinary image URL in your uploadedFiles array
-  //     uploadedFiles.push(result.secure_url);
-  //   }
-
-  //   // Combine uploaded image URLs with the other listing data
-  //   let listingData = JSON.parse(req.body.listing);
-  //   console.log(listingData,"listigdata")
-  //   listingData={...listingData,photos:uploadedFiles}
-  //   const newListing = await Listing.create(listingData);
-  //   newlistings.push(newListing); // Add the created listing to the array
-
-  //   // Create a new listing using the Listing model
-   
-  //   console.log('New listings created:', newlistings);
-
-  //   // Send a response after the loop has completed
-  //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-//   } catch (error) {
-//     console.error('Error creating listings:', error);
-//     return res.status(500).json({ error: 'An error occurred while creating the listings' });
-//   }
-// });
-
-})
+    const uploadedFiles = [];
+    const newlistings = []; // Store created listings
+  
+    try {
+      for (let i = 0; i < req.files.length; i++) {
+        const { path, originalname, mimetype } = req.files[i];
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1];
+        const newPath = path + '.' + ext;
+        console.log(newPath,"iuoih")
+        fs.renameSync(path, newPath);
+        uploadedFiles.push(newPath.replace('uploads/', ''));
+  
+        // Create a new listing using the Listing model
+     
+      }
+      let listingData = JSON.parse(req.body.listing);
+      console.log(listingData,"listigdata")
+      listingData={...listingData,photos:uploadedFiles}
+      const newListing = await Listing.create(listingData);
+      newlistings.push(newListing); // Add the created listing to the array
+  
+      console.log('New listings created:', newlistings);
+    } catch (error) {
+      console.error('Error creating listings:', error);
+      return res.status(500).json({ error: 'An error occurred while creating the listings' });
+    }
+  
+    // Send a response after the loop has completed
+    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
+  });
   
   app.post('/Listing/delete',async(req,res)=>{
     try {
