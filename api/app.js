@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
+app.use('./uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
 app.use(cookieParser());
@@ -50,7 +50,7 @@ if (!fs.existsSync(uploadsFolder)) {
 
 
 const storage = multer.memoryStorage();
-const photosMiddleWare = multer({ dest: 'uploads' });
+const photosMiddleWare = multer({ storage: storage });
 
 
           
@@ -169,56 +169,46 @@ app.post('/logout', (req, res) => {
   // });
 
 
+  
+function generateUniqueIdentifier() {
+  // Generate a UUID (Universally Unique Identifier)
+  return uuidv4();
+}
 
-  function generateUniqueIdentifier() {
-    const timestamp = new Date().getTime(); // Get the current timestamp
-    const randomValue = Math.floor(Math.random() * 1000); // Generate a random number
-    return `image_${timestamp}_${randomValue}`;
-  }
   
-  app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
-    const uploadedFiles = [];
-    const newlistings = []; // Store created listings
-  
-    try {
-      for (let i = 0; i < req.files.length; i++) {
-        const file = req.files[i];
-        console.log(file);
-  
-        // Check if file.buffer is defined and not null
-        if (file.buffer && file.buffer.length > 0) {
-          const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
-          console.log(uniqueIdentifier);
-          const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier },function(error, result) {console.log(result); });
-          console.log(result,"newfilkeimg")
-          // Store the Cloudinary image URL in your uploadedFiles array
-          uploadedFiles.push(result.secure_url);
-        } else {
-          // Handle the case where file.buffer is undefined or empty
-          console.error('Invalid file buffer:', file);
-          // Optionally, you can return an error response here
-        }
-      }
-  
-      // Combine uploaded image URLs with the other listing data
-      let listingData = JSON.parse(req.body.listing);
-      console.log(listingData, "listigdata");
-      listingData = { ...listingData, photos: uploadedFiles };
-      const newListing = await Listing.create(listingData);
-      newlistings.push(newListing); // Add the created listing to the array
-  
-      // Create a new listing using the Listing model
-  
-      console.log('New listings created:', newlistings);
-  
-      // Send a response after the loop has completed
-      res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-    } catch (error) {
-      console.error('Error creating listings:', error);
-      return res.status(500).json({ error: 'An error occurred while creating the listings' });
+app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
+  const uploadedFiles = [];
+  const newlistings = []; // Store created listings
+
+  try {
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      console.log(file)
+      const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
+      const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
+      
+      // Store the Cloudinary image URL in your uploadedFiles array
+      uploadedFiles.push(result.secure_url);
     }
-  });
-  
+
+    // Combine uploaded image URLs with the other listing data
+    let listingData = JSON.parse(req.body.listing);
+    console.log(listingData,"listigdata")
+    listingData={...listingData,photos:uploadedFiles}
+    const newListing = await Listing.create(listingData);
+    newlistings.push(newListing); // Add the created listing to the array
+
+    // Create a new listing using the Listing model
+   
+    console.log('New listings created:', newlistings);
+
+    // Send a response after the loop has completed
+    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
+  } catch (error) {
+    console.error('Error creating listings:', error);
+    return res.status(500).json({ error: 'An error occurred while creating the listings' });
+  }
+});
 
   
   
