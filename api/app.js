@@ -52,7 +52,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+
 
 
 // Register route
@@ -117,7 +117,7 @@ app.post('/logout', (req, res) => {
 
   const photosMiddleWare = multer({ dest: 'uploads' });
 
-  app.post('/allListing',async(req,res)=>{
+  app.post('/allListing',photosMiddleWare,async(req,res)=>{
     
     ownerName=req.body.userName
     
