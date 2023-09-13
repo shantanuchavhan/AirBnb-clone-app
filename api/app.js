@@ -111,7 +111,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ dest: 'uploads' });
+  const photosMiddleWare = multer({ dest: './uploads' });
 
   app.post('/allListing',async(req,res)=>{
     
