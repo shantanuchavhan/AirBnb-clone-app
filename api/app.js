@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
 
-app.use('./uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
 app.use(cookieParser());
@@ -181,7 +181,7 @@ app.post('/listing', async (req, res) => {
   console.log(req.body,"dgrf")
     
 
-  try {
+  // try {
     
   //   for (let i = 0; i < req.files.length; i++) {
   //     const file = req.files[i];
@@ -205,13 +205,13 @@ app.post('/listing', async (req, res) => {
 
   //   // Send a response after the loop has completed
   //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
-  } catch (error) {
-    console.error('Error creating listings:', error);
-    return res.status(500).json({ error: 'An error occurred while creating the listings' });
-  }
-});
+//   } catch (error) {
+//     console.error('Error creating listings:', error);
+//     return res.status(500).json({ error: 'An error occurred while creating the listings' });
+//   }
+// });
 
-  
+})
   
   app.post('/Listing/delete',async(req,res)=>{
     try {
