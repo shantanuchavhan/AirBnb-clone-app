@@ -46,8 +46,11 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    console.log("photosUploading")
   },
 });
+
+const photosMiddleWare = multer(storage);
 
 
 
@@ -111,7 +114,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer(storage);
+ 
 
   app.post('/allListing',async(req,res)=>{
     
