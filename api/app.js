@@ -189,8 +189,8 @@ app.post('/logout', (req, res) => {
         if (file.buffer && file.buffer.length > 0) {
           const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
           console.log(uniqueIdentifier);
-          const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier });
-  
+          const result = await cloudinary.uploader.upload(file.buffer.toString('base64'), { public_id: uniqueIdentifier },function(error, result) {console.log(result); });
+          console.log(result,"newfilkeimg")
           // Store the Cloudinary image URL in your uploadedFiles array
           uploadedFiles.push(result.secure_url);
         } else {
