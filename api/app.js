@@ -168,11 +168,11 @@ app.post('/logout', (req, res) => {
   //   res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   // });
 
-
+const num= 0
   
 function generateUniqueIdentifier() {
   // Generate a UUID (Universally Unique Identifier)
-  return uuidv4();
+  return num+1
 }
 
   
