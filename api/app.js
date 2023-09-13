@@ -29,6 +29,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 app.use(express.json()); // Middleware to parse JSON in request body
 app.use(express.urlencoded({ extended: true }));
+
 app.use('./uploads', express.static('uploads'));
 app.use(cors({ credentials: true, origin: 'https://airbnbcloneby-shantanu.netlify.app' }));
 
@@ -178,8 +179,7 @@ function generateUniqueIdentifier() {
   
 app.post('/listing', async (req, res) => {
   console.log(req.body,"dgrf")
-  const uploadedFiles = [];
-  const newlistings = []; // Store created listings
+    
 
   try {
     
