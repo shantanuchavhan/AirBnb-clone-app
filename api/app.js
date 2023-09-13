@@ -177,11 +177,12 @@ function generateUniqueIdentifier() {
 
   
 app.post('/listing', async (req, res) => {
+  console.log(req.body,"dgrf")
   const uploadedFiles = [];
   const newlistings = []; // Store created listings
 
   try {
-    console.log(req.body,"dgrf")
+    
   //   for (let i = 0; i < req.files.length; i++) {
   //     const file = req.files[i];
   //     const uniqueIdentifier = generateUniqueIdentifier(); // Generate a unique identifier
