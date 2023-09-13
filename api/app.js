@@ -526,6 +526,3 @@ app.listen(PORT, () => {
 });
 
 
-
- app.use('/.netlify/functions/api',router);
- module.exports.handler = serverless(app);
