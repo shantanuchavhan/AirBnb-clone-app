@@ -19,7 +19,7 @@ const Reservation=require('./model/ReservationSchema')
 const app = express();
 const PORT = 5000;
 
-
+const cloudinary = require('cloudinary').v2;
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -49,8 +49,7 @@ if (!fs.existsSync(uploadsFolder)) {
 const storage = multer.memoryStorage();
 const photosMiddleWare = multer({ storage: storage });
 
-// Configure Cloudinary with your account credentials
-import {v2 as cloudinary} from 'cloudinary';
+
           
 cloudinary.config({ 
   cloud_name: 'ddw1upvx3', 
