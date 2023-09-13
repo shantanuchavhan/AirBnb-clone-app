@@ -49,7 +49,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+
 
 
 // Register route
@@ -111,7 +111,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ dest: 'uploads' });
+  const photosMiddleWare = multer(storage);
 
   app.post('/allListing',async(req,res)=>{
     
