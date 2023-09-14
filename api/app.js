@@ -163,7 +163,7 @@ app.post('/logout', (req, res) => {
         let dataURI = "data:" + req.files[i].mimetype + ";base64," + b64;
         const cldRes = await handleUpload(dataURI);
         console.log(cldRes);
-        uploadedFiles.push(cldRes);
+        uploadedFiles.push(cldRes.url);
   
         // Create a new listing using the Listing model
       }
