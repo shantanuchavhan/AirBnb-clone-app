@@ -162,7 +162,7 @@ app.post('/logout', (req, res) => {
     try {
       for (let i = 0; i < req.files.length; i++) {
         const b64 = Buffer.from(req.file[i].buffer).toString("base64");
-        let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+        let dataURI = "data:" + req.file[i].mimetype + ";base64," + b64;
         const cldRes = await handleUpload(dataURI);
         console.log(cldRes)
         uploadedFiles.push(cldRes);
