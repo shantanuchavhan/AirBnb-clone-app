@@ -216,7 +216,7 @@ app.post('/logout', (req, res) => {
     console.log(req.body,"ahciuahc",req.files)
     const listingId=req.params.id 
     const listingData = JSON.parse(req.body.listing);
-    const { title, description, amenities, price, location } = listingData;
+    const { title, description, amenities, price, location,structure } = listingData;
 
     const uploadedFiles = [];
   
@@ -235,6 +235,7 @@ app.post('/logout', (req, res) => {
       listing.amenities = amenities;
       listing.price = price;
       listing.location = location;
+      listing.structure  =structure;
   
       // Handle uploaded files if needed (similar to your existing code)
   
