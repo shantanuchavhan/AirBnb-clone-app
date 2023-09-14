@@ -152,41 +152,35 @@ app.post('/logout', (req, res) => {
 
 
   app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
-    
-    
-    
-
     const uploadedFiles = [];
     const newlistings = []; // Store created listings
   
     try {
       for (let i = 0; i < req.files.length; i++) {
-        console.log(req.files,"req.files")
-    console.log(req.file[i],"req.body")
-        const b64 = Buffer.from(req.file[i].buffer).toString("base64");
-        let dataURI = "data:" + req.file[i].mimetype + ";base64," + b64;
+        console.log(req.files, "req.files");
+        console.log(req.files[i], "req.files[i]"); // Use req.files[i] to access individual files
+        const b64 = Buffer.from(req.files[i].buffer).toString("base64");
+        let dataURI = "data:" + req.files[i].mimetype + ";base64," + b64;
         const cldRes = await handleUpload(dataURI);
-        console.log(cldRes)
+        console.log(cldRes);
         uploadedFiles.push(cldRes);
   
         // Create a new listing using the Listing model
-     
       }
       let listingData = JSON.parse(req.body.listing);
-      console.log(listingData,"listigdata")
-      listingData={...listingData,photos:uploadedFiles}
+      console.log(listingData, "listigdata");
+      listingData = { ...listingData, photos: uploadedFiles };
       const newListing = await Listing.create(listingData);
       newlistings.push(newListing); // Add the created listing to the array
   
       console.log('New listings created:', newlistings);
+      res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
     } catch (error) {
       console.error('Error creating listings:', error);
       return res.status(500).json({ error: 'An error occurred while creating the listings' });
     }
-  
-    // Send a response after the loop has completed
-    res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   });
+  
 
 
   // app.post("/upload", upload.single("my_file"), async (req, res) => {
