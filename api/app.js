@@ -8,6 +8,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const multer = require('multer');
+const cloudinary = require("cloudinary").v2;
 const path = require('path'); // Add path module
 const fs = require('fs');
 
