@@ -39,15 +39,15 @@ app.use(session({
   saveUninitialized: true
 }));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 100);
-    cb(null,uniqueSuffix + path.extname(file.originalname));
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 100);
+//     cb(null,+ uniqueSuffix + path.extname(file.originalname));
+//   },
+// });
 
 
 
@@ -111,7 +111,7 @@ app.post('/logout', (req, res) => {
     });
   });
 
-  const photosMiddleWare = multer({ storage :storage  });
+ 
 
   app.post('/allListing',async(req,res)=>{
     
@@ -128,6 +128,28 @@ app.post('/logout', (req, res) => {
 
   })
 
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+  });
+  
+
+  async function handleUpload(file) {
+    const res = await cloudinary.uploader.upload(file, {
+      resource_type: "auto",
+    });
+    return res;
+  }
+
+  const storage = new multer.memoryStorage();
+  const photosMiddleWare= multer({
+    storage,
+  });
+
+  // const photosMiddleWare = multer({ dest: 'uploads' });
+
+
   app.post('/listing', photosMiddleWare.array('photos'), async (req, res) => {
     console.log(req.files,"req.files")
     console.log(req.body,"req.body")
@@ -139,13 +161,11 @@ app.post('/logout', (req, res) => {
   
     try {
       for (let i = 0; i < req.files.length; i++) {
-        const { path, originalname, mimetype } = req.files[i];
-        const parts = originalname.split('.');
-        const ext = parts[parts.length - 1];
-        const newPath = path + '.' + ext;
-        console.log(newPath,"iuoih")
-        fs.renameSync(path, newPath);
-        uploadedFiles.push(newPath.replace('uploads/', ''));
+        const b64 = Buffer.from(req.file[i].buffer).toString("base64");
+        let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+        const cldRes = await handleUpload(dataURI);
+        console.log(cldRes)
+        uploadedFiles.push(cldRes);
   
         // Create a new listing using the Listing model
      
@@ -165,6 +185,23 @@ app.post('/logout', (req, res) => {
     // Send a response after the loop has completed
     res.status(201).json({ message: 'Listings created successfully', listings: newlistings });
   });
+
+
+  app.post("/upload", upload.single("my_file"), async (req, res) => {
+    try {
+      const b64 = Buffer.from(req.file.buffer).toString("base64");
+      let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+      const cldRes = await handleUpload(dataURI);
+      res.json(cldRes);
+    } catch (error) {
+      console.log(error);
+      res.send({
+        message: error.message,
+      });
+    }
+  });
+
+
   
   app.post('/Listing/delete',async(req,res)=>{
     try {
