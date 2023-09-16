@@ -545,7 +545,7 @@ app.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
 });
 
 app.post('addToWishlist/:username',async(req,res)=>{
-  const userName = req.params.username;
+  const userName = req.body.username;
   const id=req.body.id;
   const user=await User.find({username:userName})
   user.wishlist.push(id)
