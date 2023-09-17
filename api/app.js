@@ -544,6 +544,18 @@ app.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
   }
 });
 
+app.get('/getWishlist/:username',async (req, res)=> {
+  const userName = req.params.username;
+  const user = await User.findOne({ username: userName });
+  if (!user) {
+    // Handle the case where the user is not found
+    return res.status(404).json({ message: "User not found" });
+  }
+  console.log(user.wishlist, "user");
+  res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
+
+})
+
 app.post('/addToWishlist', async (req, res) => {
   const userName = req.body.username;
   const id = req.body.id;
@@ -567,7 +579,7 @@ app.post('/addToWishlist', async (req, res) => {
   } else {
     user.wishlist.push(id);
     await user.save();
-    res.json({ wishlist: user[0].wishlist, message: "Room added to wishlist" });
+    res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
   }
 });
 
