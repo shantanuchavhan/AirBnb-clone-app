@@ -565,7 +565,7 @@ app.post('/addToWishlist', async (req, res) => {
     await user.save();
     res.json({ wishlist: user.wishlist, message: "Room removed from wishlist" });
   } else {
-    user.wishlist.push(parseInt(id));
+    user.wishlist.push(id);
     await user.save();
     res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
   }
