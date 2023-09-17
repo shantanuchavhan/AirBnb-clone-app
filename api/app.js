@@ -544,23 +544,33 @@ app.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
   }
 });
 
-app.post('/addToWishlist',async(req,res)=>{
+app.post('/addToWishlist', async (req, res) => {
   const userName = req.body.username;
-  const id=req.body.id;
-  console.log(userName,id,"userName")
-  const user=await User.find({username:userName})
-  console.log(user[0].wishlist,"user")
-  if(user[0].wishlist.include(id)){
-    user[0].wishlist.filter((listid)=>listid==id)
-    await user.save()
-    res.json({ wishlist: user.wishlist, message:"room added in wishlist"});
-  }else{
-    user[0].wishlist.push(id)
-    await user.save()
-    res.json({ wishlist: user.wishlist, message:"room removed from wishlist"});
+  const id = req.body.id;
+  console.log(userName, id, "userName");
+
+  // Use findOne to find a single user by username
+  const user = await User.findOne({ username: userName });
+
+  if (!user) {
+    // Handle the case where the user is not found
+    return res.status(404).json({ message: "User not found" });
   }
 
-})
+  console.log(user.wishlist, "user");
+
+  if (user.wishlist.includes(id)) {
+    // Use filter to remove the matching id from the wishlist
+    user.wishlist = user.wishlist.filter((listid) => listid != id);
+    await user.save();
+    res.json({ wishlist: user.wishlist, message: "Room removed from wishlist" });
+  } else {
+    user.wishlist.push(id);
+    await user.save();
+    res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
+  }
+});
+
 
 
 
