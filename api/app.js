@@ -544,18 +544,36 @@ app.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
   }
 });
 
-app.get('/getWishlist/:username',async (req, res)=> {
-  const userName = req.params.username;
-  console.log(userName, "user");
-  const user = await User.findOne({ username: userName });
-  if (!user) {
-    // Handle the case where the user is not found
-    return res.status(404).json({ message: "User not found" });
-  }
-  console.log(user.wishlist, "user");
-  res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
+app.get('/getWishlist/:username', async (req, res) => {
+  const userName = req.params.username; // Get the username from the query parameter
+  console.log(userName, "userName");
 
-})
+  try {
+    // Use findOne to find a single user by username
+    const user = await User.findOne({ username: userName });
+
+    if (!user) {
+      // Handle the case where the user is not found
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(user.wishlist, "user");
+
+    // Get the wishlist IDs from the user's wishlist
+    const wishlistIds = user.wishlist;
+
+    // Use the wishlist IDs to find corresponding listings
+    const listings = await Listing.find({ _id: { $in: wishlistIds } });
+
+    // Return the listings from the wishlist
+    res.json({ wishlistItems: listings });
+  } catch (error) {
+    console.error('Error fetching wishlist:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the wishlist' });
+  }
+});
+
+
 
 app.post('/addToWishlist', async (req, res) => {
   const userName = req.body.username;
