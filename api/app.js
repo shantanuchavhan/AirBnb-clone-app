@@ -549,7 +549,7 @@ app.post('/addToWishlist',async(req,res)=>{
   const id=req.body.id;
   console.log(userName,id,"userName")
   const user=await User.find({username:userName})
-  console.log(user,"user")
+  console.log(user[0],"user")
   if(user[0].wishlist.include(id)){
     user[0].wishlist.filter((listid)=>listid==id)
     await user.save()
