@@ -567,7 +567,7 @@ app.post('/addToWishlist', async (req, res) => {
   } else {
     user.wishlist.push(id);
     await user.save();
-    res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
+    res.json({ wishlist: user[0].wishlist, message: "Room added to wishlist" });
   }
 });
 
