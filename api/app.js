@@ -550,8 +550,15 @@ app.post('/addToWishlist',async(req,res)=>{
   console.log(userName,id,"userName")
   const user=await User.find({username:userName})
   console.log(user,"user")
-  user.wishlist.push(id)
-  await user.save()
+  if(user.wishlist.include(id)){
+    user.wishlist.filter((listid)=>listid==id)
+    await user.save()
+    res.json({ wishlist: user.wishlist, message:"room added in wishlist"});
+  }else{
+    user.wishlist.push(id)
+    await user.save()
+    res.json({ wishlist: user.wishlist, message:"room removed from wishlist"});
+  }
 
 })
 
