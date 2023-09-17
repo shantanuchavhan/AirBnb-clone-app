@@ -546,6 +546,7 @@ app.delete('/listings/:id/reviews/:reviewId', async (req, res) => {
 
 app.get('/getWishlist/:username',async (req, res)=> {
   const userName = req.params.username;
+  console.log(userName, "user");
   const user = await User.findOne({ username: userName });
   if (!user) {
     // Handle the case where the user is not found
