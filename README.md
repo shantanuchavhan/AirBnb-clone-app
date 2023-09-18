@@ -1,4 +1,4 @@
-# AirBnb-clone-app
+# AirBnb-clone-app-api
 
 https://64fed3d5860af040388682ca--incandescent-twilight-a7ef13.netlify.app/
 
