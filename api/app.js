@@ -574,6 +574,24 @@ app.get('/getWishlist/:username', async (req, res) => {
 });
 
 
+app.get("/getWishlistids/:username",async(req,res)=>{
+  const userName = req.params.username; // Get the username from the query parameter
+  console.log(userName, "userName");
+
+  try{
+    const user = await User.findOne({ username: userName });
+    if (!user) {
+      // Handle the case where the user is not found
+      return res.status(404).json({ message: "User not found" });
+    }
+
+  }catch (error) {
+    console.error('Error fetching wishlist:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the wishlist' });
+  }
+
+})
+
 
 app.post('/addToWishlist', async (req, res) => {
   const userName = req.body.username;
