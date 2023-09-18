@@ -11,10 +11,11 @@ const multer = require('multer');
 const path = require('path'); // Add path module
 const fs = require('fs');
 // Generate JWT token
-function generateToken(user) {
-  // Replace 'your-secret-key' with your actual secret key
-  return jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
-}
+
+
+app.use(express.json()); // Middleware to parse JSON in request body
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

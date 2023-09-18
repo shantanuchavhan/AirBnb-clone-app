@@ -87,10 +87,15 @@ app.post('/login', async (req, res) => {
 });
 
 // Profile route
-app.get('/profile', (req, res) => {
+app.get('/profile',async(req, res) => {
     const username = req.session.username;
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      // Handle the case where the user is not found
+      return res.status(404).json({ message: "User not found" });
+    }
     if (username) {
-        res.json({ username: username });
+        res.json({ user: user});
     } else {
         res.status(401).send('Not logged in');
     }
@@ -584,6 +589,7 @@ app.get("/getWishlistids/:username",async(req,res)=>{
       // Handle the case where the user is not found
       return res.status(404).json({ message: "User not found" });
     }
+    res.json({ userwishidlist: user.wishlist });
 
   }catch (error) {
     console.error('Error fetching wishlist:', error);
