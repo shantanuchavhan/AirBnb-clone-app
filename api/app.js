@@ -594,10 +594,12 @@ app.post('/addToWishlist', async (req, res) => {
     // Use filter to remove the matching id from the wishlist
     user.wishlist = user.wishlist.filter((listid) => listid != id);
     await user.save();
+    console.log(user.wishlist)
     res.json({ wishlist: user.wishlist, message: "Room removed from wishlist" });
   } else {
     user.wishlist.push(id);
     await user.save();
+    console.log(user.wishlist)
     res.json({ wishlist: user.wishlist, message: "Room added to wishlist" });
   }
 });
