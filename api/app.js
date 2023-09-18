@@ -87,8 +87,8 @@ app.post('/login', async (req, res) => {
 });
 
 // Profile route
-app.get('/profile',async(req, res) => {
-    const username = req.session.username;
+app.get('/profile/:username',async(req, res) => {
+    const username = req.params.username;
     const user = await User.findOne({ username: username });
     if (!user) {
       // Handle the case where the user is not found
